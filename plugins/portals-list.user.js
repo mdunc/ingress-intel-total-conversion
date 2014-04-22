@@ -136,9 +136,31 @@ window.plugin.portalslist.downloadKML = function() {
   var kmlData = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>';
   $.each(portals, function(ind, portal) {
     var coords = portal.portal.getLatLng();
+    var descData = "<strong>Level:</strong>" + portal.level + "<br>" 
+                 + "<strong>Team:</strong>" + portal.team + "<br>"
+                 + "<strong>Link:</strong>" + window.plugin.portalslist.getPortalLink(portal, portal.guid) + "<br>"
+                 + "<img src='" + portal.portal.options.data.image + "' /><br>";
+    var labelColor = null;
+    var icon = null;
+    switch (portal.teamN) {
+      case TEAM_NONE:
+        labelColor = "cc333333";
+        icon = "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png";
+        break;
+      case TEAM_ENL:
+        labelColor = "cc0C9119";
+        icon = "http://maps.google.com/mapfiles/kml/paddle/grn-blank.png";
+        break;
+      case TEAM_RES:
+        labelColor = "ccAD5910";
+        icon = "http://maps.google.com/mapfiles/kml/paddle/blu-blank.png";
+        break;
+    }
     kmlData += '<Placemark>'
+             + '<Style><IconStyle><Icon><href>' + icon + '</href></Icon></IconStyle>'
+             + '<LabelStyle><color>' + labelColor + '</color></LabelStyle></Style>'
              + '<name>' + portal.name + '</name>'
-             + '<description>' + portal.description + '</description>'
+             + '<description><![CDATA[' + descData + ']]></description>'
              + '<Point><coordinates>' + coords.lng + ',' + coords.lat + '</coordinates></Point>'
              + '</Placemark>';
   });
@@ -258,7 +280,7 @@ window.plugin.portalslist.getPortalLink = function(portal,guid) {
   var latlng = [coord.lat, coord.lng].join();
   var jsSingleClick = 'window.renderPortalDetails(\''+guid+'\');return false';
   var jsDoubleClick = 'window.zoomToAndShowPortal(\''+guid+'\', ['+latlng+']);return false';
-  var perma = '/intel?ll='+coord.lat+','+coord.lng+'&z=17&pll='+coord.lat+','+coord.lng;
+  var perma = 'https://www.ingress.com/intel?ll='+coord.lat+','+coord.lng+'&z=17&pll='+coord.lat+','+coord.lng;
 
   //Use Jquery to create the link, which escape characters in TITLE and ADDRESS of portal
   var a = $('<a>',{
